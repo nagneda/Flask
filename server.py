@@ -7,7 +7,6 @@ topics = [
     {'id':1, 'title':'python','body':'python is...' },
     {'id':2, 'title':'c++','body':'c++ is...' },
     {'id':3, 'title':'java','body':'java is...' }
-
  ]
 
 def template(contents,content):
@@ -19,11 +18,16 @@ def template(contents,content):
         <title>  </title>
     </head>
     <body>
-        <h1>FLASK</h1>
+        <h1><a href ="/">FLASK</a></h1>
         <ol>
             {contents}     
         </ol>
+        
         {content}
+        <ul>
+
+            <li><h2><a href="/create/">create</a></h2></li>
+        </ul>
     </body>
     </html>
     '''
@@ -35,12 +39,17 @@ def getcontents():
 
 @app.route('/')
 def index():
-    return template(getcontents(),'<h2>welcome!!</h2>')
+    return template(getcontents(),'<h2>welcome to my world</h2>')
     
     
 @app.route('/create/')
 def create():
-    return '<h1> create </h1>'
+    content='''
+    <p><input type = "text" name="title" placeholder="Enter the title..."></p>
+    <p><textarea name="body" placeholder="Enter the sentence..."></textarea></p>
+    <input type = "submit" value="submit">
+    '''
+    return template(getcontents(),content)
 
 
     
@@ -51,7 +60,7 @@ def read(id):
         if int(id)==topic['id']:
             body=topic['body']
             title=topic['title']
-            
+            break
             
     return template(getcontents(), f'<h2>{title}</h2>{body}')
     
