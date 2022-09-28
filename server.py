@@ -14,6 +14,8 @@ def template(contents,content,title,id=None):
     if id!=None:
         update=f'''
         <li><a href = "/update/{id}/">update</a></li>
+        <li><form action="/delete/{id}/" method="POST">
+        <input type="submit" value="delete">
         '''
     return f'''
     <!doctype html>
@@ -50,7 +52,7 @@ def getcontents():
 
 @app.route('/')
 def index():
-    return template(getcontents(),'<h2>welcome to my world</h2>','Flask')
+    return template(getcontents(), '<h2>welcome to my world</h2>','Flask')
 
 @app.route('/update/<int:id>/', methods=['GET','POST'])
 def update(id):
@@ -59,7 +61,7 @@ def update(id):
             if id==topic['id']:
                 body=topic['body']
                 title=topic['title']
-                break
+                break 
         content=f'''
             <form action="/update/{id}" method="POST">
                 <p><input type = "text" name="title" value="{title}"></p>
@@ -103,6 +105,16 @@ def create():
         return redirect(url)#redirect 사용자의 웹브라우저에게 어디로 이동하라고 명령가능
 
     
+@app.route('/delete/<int:id>/', methods=['POST'])
+def delete(id):
+    for topic in topics:
+        if id==topic['id']:
+            topics.remove(topic)
+            break
+    return redirect('/')
+
+
+
 @app.route('/read/<id>/')
 def read(id):
     
