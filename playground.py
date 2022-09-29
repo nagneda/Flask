@@ -79,7 +79,6 @@ def norifunc(id):
         for norinum in nori:
             if norinum['id']==id:
                 title=norinum['title']
-                
                 updateid=id
                 break
         string=''
@@ -134,12 +133,7 @@ def create():
 #UPDATE====================================================
 @app.route('/update/', methods=['POST','GET'])
 def update():
-   
-                
-    string='<h2>수정할 게시판을 선택해주세요.</h2>'
-    for norinum in nori:
-        string+=f'<li><a href ="/updatesite/{norinum["id"]}/">{norinum["title"]}</a></li>'
-    return string+'<a href="/">처음으로</a>'
+    return '<h2>수정할 게시판을 선택해주세요.</h2>'+getstring()+'<a href="/">처음으로</a>'
     
 @app.route('/updatesite/<int:id>/', methods=['POST','GET'])
 def updatesite(id):
