@@ -21,14 +21,7 @@ updateid=0
 @app.route('/' , methods=['GET','POST'])
 def start():
     
-    if request.method=='POST':
-        global newid
-        title=request.form['title']
-        nori.append({'id':newid,'title':title})
-        global variable
-        variable='nori'+str(newid)
-        globals()[variable]=[]
-        newid+=100
+    
     return homepage(getstring())
 
 def getstring():
@@ -71,6 +64,7 @@ def homepage(norilist):
 @app.route('/nori/<int:id>/', methods=['GET','POST'])
 def norifunc(id):
     variable2='nori'+str(id)
+    global updateid
     if request.method=='POST':
         title=request.form['title']
         body=request.form['body']
@@ -78,23 +72,28 @@ def norifunc(id):
         newid_100+=1
         var=globals()[variable2]
         var.append({'id':newid_100,'title':title,'body':body})
-    for norinum in nori:
-        if norinum['id']==id:
-            title=norinum['title']
-            global updateid
-            updateid=id
-            break
-    string=''
-    for newids in globals()[variable2]:
-        string+=f'<li><a href="/nori/{id}/{newids["id"]}/">{newids["title"]}</a></li>'
-    return f'''
-    <h1>{title}</h1>
-    {string}
-    <a href="/nori/create/">게시글 작성하기</a><br>
-    <form action="/delete/{id}/" method="POST">
-    <input type="submit" value="놀이터 삭제하기"><br>
-    <a href="/">처음으로</a>
-    '''
+   
+        return redirect(f'/nori/{updateid}/')
+
+    elif request.method=='GET':
+        for norinum in nori:
+            if norinum['id']==id:
+                title=norinum['title']
+                
+                updateid=id
+                break
+        string=''
+        for newids in globals()[variable2]:
+            string+=f'<li><a href="/nori/{id}/{newids["id"]}/">{newids["title"]}</a></li>'
+        
+        return f'''
+        <h1>{title}</h1>
+        {string}
+        <a href="/nori/create/">게시글 작성하기</a><br>
+        <form action="/delete/{id}/" method="POST">
+         <input type="submit" value="놀이터 삭제하기"><br>
+        <a href="/">처음으로</a>
+        '''
 
 #CREATE=============================================================================   
 @app.route('/nori/create/')
@@ -113,10 +112,20 @@ def noricreate():
 
 @app.route('/create/' ,methods=['GET','POST'])
 def create():
+    if request.method=='POST':
+        global newid
+        title=request.form['title']
+        nori.append({'id':newid,'title':title})
+        global variable
+        variable='nori'+str(newid)
+        globals()[variable]=[]
+        newid+=100
+        return redirect('/')
 
-    return '''
+    elif request.method=='GET':
+        return '''
     <h1>놀이터 생성하기</h1>
-    <form action = "/" method = "POST">
+    <form action = "/create/" method = "POST">
     <input type="text" name="title" placeholder="게시판 이름">
     <input type="submit" value="생성하기">
     </form>
@@ -125,31 +134,36 @@ def create():
 #UPDATE====================================================
 @app.route('/update/', methods=['POST','GET'])
 def update():
-    global updateid
-    if request.method=='POST':
-        for norinum in nori:
-            if norinum['id']==updateid:
-                norinum['title']=request.form['title']
+   
                 
     string='<h2>수정할 게시판을 선택해주세요.</h2>'
     for norinum in nori:
         string+=f'<li><a href ="/updatesite/{norinum["id"]}/">{norinum["title"]}</a></li>'
     return string+'<a href="/">처음으로</a>'
     
-@app.route('/updatesite/<int:id>/')
+@app.route('/updatesite/<int:id>/', methods=['POST','GET'])
 def updatesite(id):
-    for norinum in nori:
-        if norinum['id']==id:
-            global updateid
-            updateid=id
-            updatebox=f'''
-            <form action = "/update/" method="POST">
-            <input type="text" name="title" value={norinum['title']}>
-            <input type="submit" value="수정하기">
-            '''
-            
-            break
-    return updatebox
+    global updateid
+    if request.method=='POST':
+        for norinum in nori:
+            if norinum['id']==updateid:
+                norinum['title']=request.form['title']
+                break
+        return redirect('/update/')
+
+    elif request.method=='GET':      
+        for norinum in nori:
+            if norinum['id']==id:
+                
+                updateid=id
+                updatebox=f'''
+                <form action = "/updatesite/{updateid}/" method="POST">
+                <input type="text" name="title" value={norinum['title']}>
+                <input type="submit" value="수정하기">
+                '''
+                
+                break
+        return updatebox
 #DELETE====================================================================
 @app.route('/delete/<int:id>/', methods=['POST'])
 def delete(id):
@@ -183,3 +197,5 @@ def warning():
     본 사이트는 게시글의 열람 수정의 권한이 사용자 모두에게 허용돼있으므로 주의하시길 바랍니다.
     '''
 app.run(debug=True)
+
+#redirect를 사용해야 페이지 새로고침시 중복실행이 되지 않음.
