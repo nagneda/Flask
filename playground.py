@@ -29,10 +29,7 @@ def start():
         variable='nori'+str(newid)
         globals()[variable]=[]
         newid+=100
-        
-
     return homepage(getstring())
-
 
 def getstring():
     string=''
