@@ -131,9 +131,12 @@ def create():
     
     '''
 #UPDATE====================================================
-@app.route('/update/', methods=['POST','GET'])
+@app.route('/update/')
 def update():
-    return '<h2>수정할 게시판을 선택해주세요.</h2>'+getstring()+'<a href="/">처음으로</a>'
+    string=''
+    for norinum in nori:
+        string+=f'<li><a href="/updatesite/{norinum["id"]}/">{norinum["title"]}</a></li>'
+    return '<h2>수정할 게시판을 선택해주세요.</h2>'+string+'<a href="/">처음으로</a>'
     
 @app.route('/updatesite/<int:id>/', methods=['POST','GET'])
 def updatesite(id):
